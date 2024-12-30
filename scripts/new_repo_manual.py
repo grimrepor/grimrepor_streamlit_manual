@@ -1,4 +1,5 @@
 import os
+import streamlit as st
 import subprocess
 import shutil
 import requests
@@ -16,18 +17,26 @@ from typing import Callable
 # Load environment variables from .env file
 load_dotenv()
 
+
+def get_secret(key: str) -> str:
+    """Get secret from environment or Streamlit secrets."""
+    return os.getenv(key) or st.secrets.get(key)
+
+GITHUB_TOKEN = get_secret("GITHUB_TOKEN")
+OPENAI_API_KEY = get_secret("OPENAI_API_KEY")
+
+if not GITHUB_TOKEN or not OPENAI_API_KEY:
+    raise ValueError("Missing required secrets")
+
+
 def get_project_root():
     result = subprocess.check_output("git rev-parse --show-toplevel", shell=True).decode('utf-8')
     return result.strip()
 
 ROOT = get_project_root()
 GITHUB_API_URL = "https://api.github.com/user/repos"
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
-if not GITHUB_TOKEN:
-    raise ValueError("GITHUB_TOKEN not found in .env file")
 
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 g = Github(GITHUB_TOKEN)
 client = instructor.from_openai(OpenAI(api_key=OPENAI_API_KEY))
 

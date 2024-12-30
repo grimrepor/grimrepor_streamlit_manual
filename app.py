@@ -1,6 +1,25 @@
 import streamlit as st
 import sys
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Get secrets from environment variables or Streamlit secrets
+def get_secret(key: str) -> str:
+    """Get secret from environment or Streamlit secrets."""
+    return os.getenv(key) or st.secrets.get(key)
+
+
+# Use the secrets in your code
+GITHUB_TOKEN = get_secret("GITHUB_TOKEN")
+OPENAI_API_KEY = get_secret("OPENAI_API_KEY")
+
+if not GITHUB_TOKEN or not OPENAI_API_KEY:
+    st.error("Missing required secrets. Please check your environment variables or Streamlit secrets.")
+    st.stop()
+
 
 # Add parent directory to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
